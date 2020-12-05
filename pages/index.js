@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
-import { useEffect, useState } from "react";
+
+import Status from "../src/components/Status";
 
 export default function Home() {
   return (
@@ -16,6 +18,7 @@ export default function Home() {
           カードにパスコードを<Link href="/register">登録する</Link>
         </h1>
         <NFCUsableFlag></NFCUsableFlag>
+        <Status></Status>
       </main>
       <footer className={styles.footer}>このアプリについて</footer>
     </div>
