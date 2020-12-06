@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/Register.module.css";
 
 import Status from "../src/components/status";
+import { MAIN_MESSAGE } from "../src/constants/message";
 
 export default function Register() {
   const [nfcId, setNFCId] = useState("");
+  const [passcode, setPasscode] = useState("");
+  const [mainMessage, setMainMessage] = useState(MAIN_MESSAGE.READ_WAIT);
 
+  // 初回NFCカードID確認
   useEffect(() => {
     const reader = new NDEFReader();
 
@@ -20,13 +24,44 @@ export default function Register() {
         };
         reader.onreading = (event) => {
           setNFCId(event.serialNumber);
+          if (passcode.length <= 0) {
+            setMainMessage(MAIN_MESSAGE.INPUT_WAIT);
+          }
         };
       })
       .catch((error) => {
         console.log(error);
         alert("NFCカードの読み込み準備に失敗しました");
       });
-  });
+  }, []);
+
+  // パスコード入力待機・書き込み処理
+  useEffect(() => {
+    if (passcode.length <= 0) return () => {};
+
+    let timer = setTimeout(async () => {
+      setMainMessage(MAIN_MESSAGE.WRITE_STAND_BY);
+
+      const writeResult = await writeStart(passcode);
+
+      if (writeResult) {
+        setMainMessage(MAIN_MESSAGE.SUCCESS);
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [passcode]);
+
+  // パスコードの入力チェック
+  const inputPassCode = (passcode) => {
+    setPasscode(passcode);
+
+    if (passcode.length <= 0) {
+      setMainMessage(MAIN_MESSAGE.INPUT_WAIT);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -61,11 +96,15 @@ export default function Register() {
               <label className={styles.stepLabel}>パスコード</label>
               <input
                 className={styles.stepInput}
+                onChange={(e) => {
+                  inputPassCode(e.target.value);
+                }}
+                value={passcode}
                 placeholder="パスコード"
                 type="password"
               />
             </div>
-            <Status></Status>
+            <Status message={mainMessage}></Status>
             <div className={styles.stepWrapper}>
               <h2 className={styles.stepTitle}>3.&nbsp;書き込みチェック</h2>
               <p className={styles.stepDescription}>
@@ -82,3 +121,19 @@ export default function Register() {
     </div>
   );
 }
+
+const writeStart = async (passcode) => {
+  const writer = new NDEFWriter();
+
+  try {
+    await writer.write({
+      records: [{ recordType: "text", data: passcode }],
+    });
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    // alert("何らかの原因でパスコード書き込みに失敗しました");
+    return false;
+  }
+};
