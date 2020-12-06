@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 
-import Status from "../src/components/Status";
+import Status from "../src/components/status";
 
 export default function Home() {
   return (
