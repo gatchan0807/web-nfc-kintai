@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/Register.module.css";
@@ -5,6 +6,28 @@ import styles from "../styles/Register.module.css";
 import Status from "../src/components/status";
 
 export default function Register() {
+  const [nfcId, setNFCId] = useState("");
+
+  useEffect(() => {
+    const reader = new NDEFReader();
+
+    reader
+      .scan()
+      .then(() => {
+        reader.onerror = (event) => {
+          console.log(event);
+          alert("何らかの原因で読み込みに失敗しました");
+        };
+        reader.onreading = (event) => {
+          setNFCId(event.serialNumber);
+        };
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("NFCカードの読み込み準備に失敗しました");
+      });
+  });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -23,8 +46,9 @@ export default function Register() {
               <label className={styles.stepLabel}>カードID</label>
               <input
                 className={`${styles.stepInput} ${styles.gray}`}
-                placeholder="NFCカードID"
+                placeholder="カードを読み込んでください"
                 readOnly
+                value={nfcId}
               />
             </div>
             <div className={styles.stepWrapper}>
