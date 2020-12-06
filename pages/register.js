@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
+import styles from "../styles/Register.module.css";
 
-import styles from "../styles/Home.module.css";
 import Status from "../src/components/status";
 
 export default function Register() {
@@ -11,30 +11,43 @@ export default function Register() {
         <title>パスコード登録</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <h1>カードにパスコードを登録</h1>
+      <main>
+        <h1 className={styles.pageTitle}>カードにパスコードを登録</h1>
         <div>
           <div>
-            <div>
-              <h2>カードIDを確認</h2>
-              <p>
+            <div className={styles.stepWrapper}>
+              <h2 className={styles.stepTitle}>1.&nbsp;カードIDを確認</h2>
+              <p className={styles.stepDescription}>
                 まずはNFCカードのIDを読み込んで確認し、スプレッドシートに登録してください
               </p>
-              <label>カードID</label>
-              <input placeholder="NFCカードID" />
+              <label className={styles.stepLabel}>カードID</label>
+              <input
+                className={`${styles.stepInput} ${styles.gray}`}
+                placeholder="NFCカードID"
+                readOnly
+              />
             </div>
-            <div>
-              <h2>カードに登録するパスコードを入力</h2>
-              <p>
+            <div className={styles.stepWrapper}>
+              <h2 className={styles.stepTitle}>
+                2.&nbsp;カードに登録するパスコードを入力
+              </h2>
+              <p className={styles.stepDescription}>
                 NFCカードにパスコードを書き込み、NFCカードIDと紐付けてスプレッドシートに登録してください
               </p>
-              <label>パスコード</label>
-              <input placeholder="パスコード" type="password" />
+              <label className={styles.stepLabel}>パスコード</label>
+              <input
+                className={styles.stepInput}
+                placeholder="パスコード"
+                type="password"
+              />
             </div>
             <Status></Status>
-            <div>
-              <label>書き込みチェック</label>
-              <button>チェック開始</button>
+            <div className={styles.stepWrapper}>
+              <h2 className={styles.stepTitle}>3.&nbsp;書き込みチェック</h2>
+              <p className={styles.stepDescription}>
+                最後に書き込んだパスコードと入力されている内容が間違いないかチェック
+              </p>
+              <button className={styles.button}>チェック開始</button>
             </div>
           </div>
         </div>
