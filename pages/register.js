@@ -63,6 +63,27 @@ export default function Register() {
     }
   };
 
+  const startConfirmPassCode = () => {
+    setMainMessage(MAIN_MESSAGE.TOUCH_CARD);
+    const reader = new NDEFReader();
+
+    reader.scan().then(() => {
+      reader.onreading = (event) => {
+        const record = event.message.records[0];
+        const { data, encoding, recordType } = record;
+
+        if (recordType === "text") {
+          const textDecoder = new TextDecoder(encoding);
+          const text = textDecoder.decode(data);
+
+          if (passcode === text) {
+            setMainMessage(MAIN_MESSAGE.PASSCODE_MATCHED);
+          }
+        }
+      };
+    });
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -110,7 +131,12 @@ export default function Register() {
               <p className={styles.stepDescription}>
                 最後に書き込んだパスコードと入力されている内容が間違いないかチェック
               </p>
-              <button className={styles.button}>チェック開始</button>
+              <button
+                className={styles.button}
+                onTouchEnd={startConfirmPassCode}
+              >
+                チェック開始
+              </button>
             </div>
           </div>
         </div>
