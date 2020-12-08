@@ -22,7 +22,9 @@ export default function Home() {
             alert("何らかの原因で読み込みに失敗しました");
           };
           reader.onreading = async (event) => {
+            // TODO: カードのserialNumberとtext dataを取得
             console.log(event.serialNumber);
+            // 表示メッセージを変更
             setMainMessage(MAIN_MESSAGE.SENDING);
             // APIリクエスト実行
             const res = await fetch("/api/hello");
