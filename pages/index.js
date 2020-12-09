@@ -55,12 +55,33 @@ export default function Home() {
  * @param {*} hooksFunctions
  */
 const postNFCDataToApi = async (event, { setMainMessage }) => {
-  // TODO: カードのserialNumberとtext dataを取得
-  console.log(event.serialNumber);
+  let payload = {
+    cardId: "",
+    passcode: "",
+  };
+
+  payload.cardId = event.serialNumber;
+
+  const record = event.message.records[0];
+  const { data, encoding, recordType } = record;
+
+  if (recordType === "text") {
+    const textDecoder = new TextDecoder(encoding);
+    payload.passcode = textDecoder.decode(data);
+  }
+  // チェック用
+  console.log(payload);
+
   // 表示メッセージを変更
   setMainMessage(MAIN_MESSAGE.SENDING);
   // APIリクエスト実行
-  const res = await fetch("/api/hello");
+  const res = await fetch("/api/hello", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
   console.log(await res.json());
 
   // TODO: API結果によってMAIN_MESSAGEの値を変更
