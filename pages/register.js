@@ -5,6 +5,10 @@ import styles from "../styles/Register.module.css";
 
 import Status from "../src/components/status";
 import { MAIN_MESSAGE } from "../src/constants/message";
+import {
+  onReadErrorWithAlert,
+  onStanbyErrorWithAlert,
+} from "../src/lib/nfcHandlers";
 
 export default function Register() {
   const [nfcId, setNFCId] = useState("");
@@ -18,10 +22,7 @@ export default function Register() {
     reader
       .scan()
       .then(() => {
-        reader.onerror = (event) => {
-          console.log(event);
-          alert("何らかの原因で読み込みに失敗しました");
-        };
+        reader.onerror = onReadErrorWithAlert;
         reader.onreading = (event) => {
           setNFCId(event.serialNumber);
           if (passcode.length <= 0) {
@@ -29,10 +30,7 @@ export default function Register() {
           }
         };
       })
-      .catch((error) => {
-        console.log(error);
-        alert("NFCカードの読み込み準備に失敗しました");
-      });
+      .catch(onStanbyErrorWithAlert);
   }, []);
 
   // パスコード入力待機・書き込み処理
