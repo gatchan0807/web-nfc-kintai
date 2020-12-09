@@ -22,16 +22,8 @@ export default function Home() {
         .scan()
         .then(() => {
           reader.onerror = onReadErrorWithAlert;
-          reader.onreading = async (event) => {
-            // TODO: カードのserialNumberとtext dataを取得
-            console.log(event.serialNumber);
-            // 表示メッセージを変更
-            setMainMessage(MAIN_MESSAGE.SENDING);
-            // APIリクエスト実行
-            const res = await fetch("/api/hello");
-            console.log(await res.json());
-
-            // TODO: API結果によってMAIN_MESSAGEの値を変更
+          reader.onreading = (event) => {
+            postNFCDataToApi(event, { setMainMessage });
           };
         })
         .catch(onStanbyErrorWithAlert);
@@ -56,3 +48,20 @@ export default function Home() {
     </div>
   );
 }
+
+/**
+ * NFCカードに書き込まれたパスコードとNFCカードのIDをAPIに送信する関数（ハンドラ）
+ * @param {*} event
+ * @param {*} hooksFunctions
+ */
+const postNFCDataToApi = async (event, { setMainMessage }) => {
+  // TODO: カードのserialNumberとtext dataを取得
+  console.log(event.serialNumber);
+  // 表示メッセージを変更
+  setMainMessage(MAIN_MESSAGE.SENDING);
+  // APIリクエスト実行
+  const res = await fetch("/api/hello");
+  console.log(await res.json());
+
+  // TODO: API結果によってMAIN_MESSAGEの値を変更
+};

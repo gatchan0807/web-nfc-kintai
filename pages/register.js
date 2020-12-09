@@ -23,12 +23,8 @@ export default function Register() {
       .scan()
       .then(() => {
         reader.onerror = onReadErrorWithAlert;
-        reader.onreading = (event) => {
-          setNFCId(event.serialNumber);
-          if (passcode.length <= 0) {
-            setMainMessage(MAIN_MESSAGE.INPUT_WAIT);
-          }
-        };
+        reader.onreading = (event) =>
+          nfcIdReadHandler(event, passcode, { setNFCId, setMainMessage });
       })
       .catch(onStanbyErrorWithAlert);
   }, []);
@@ -41,7 +37,6 @@ export default function Register() {
       setMainMessage(MAIN_MESSAGE.WRITE_STAND_BY);
 
       const writeResult = await writeStart(passcode);
-
       if (writeResult) {
         setMainMessage(MAIN_MESSAGE.SUCCESS);
       }
@@ -52,7 +47,7 @@ export default function Register() {
     };
   }, [passcode]);
 
-  // パスコードの入力チェック
+  // パスコードの入力処理
   const inputPassCode = (passcode) => {
     setPasscode(passcode);
 
@@ -61,24 +56,14 @@ export default function Register() {
     }
   };
 
+  //パスコードの内容チェック
   const startConfirmPassCode = () => {
     setMainMessage(MAIN_MESSAGE.TOUCH_CARD);
     const reader = new NDEFReader();
 
     reader.scan().then(() => {
-      reader.onreading = (event) => {
-        const record = event.message.records[0];
-        const { data, encoding, recordType } = record;
-
-        if (recordType === "text") {
-          const textDecoder = new TextDecoder(encoding);
-          const text = textDecoder.decode(data);
-
-          if (passcode === text) {
-            setMainMessage(MAIN_MESSAGE.PASSCODE_MATCHED);
-          }
-        }
-      };
+      reader.onreading = (event) =>
+        nfcCardPasscodeReadHandler(event, passcode, { setMainMessage });
     });
   };
 
@@ -146,6 +131,7 @@ export default function Register() {
   );
 }
 
+// ============== NFC Handlers ==============
 const writeStart = async (passcode) => {
   const writer = new NDEFWriter();
 
@@ -159,5 +145,38 @@ const writeStart = async (passcode) => {
     console.log(error);
     // alert("何らかの原因でパスコード書き込みに失敗しました");
     return false;
+  }
+};
+
+/**
+ * 初回NFCカード読み込み成功時の処理をまとめた関数（ハンドラ）
+ * @param {*} event
+ * @param {*} passcode
+ * @param {*} hooksFunctions
+ */
+const nfcIdReadHandler = (event, passcode, { setNFCId, setMainMessage }) => {
+  setNFCId(event.serialNumber);
+  if (passcode.length <= 0) {
+    setMainMessage(MAIN_MESSAGE.INPUT_WAIT);
+  }
+};
+
+/**
+ * NFCカードに書き込まれたパスコードと入力済みの内容をチェックする関数（ハンドラ）
+ * @param {*} event
+ * @param {*} passcode
+ * @param {*} hooksFunctions
+ */
+const nfcCardPasscodeReadHandler = (event, passcode, { setMainMessage }) => {
+  const record = event.message.records[0];
+  const { data, encoding, recordType } = record;
+
+  if (recordType === "text") {
+    const textDecoder = new TextDecoder(encoding);
+    const text = textDecoder.decode(data);
+
+    if (passcode === text) {
+      setMainMessage(MAIN_MESSAGE.PASSCODE_MATCHED);
+    }
   }
 };
