@@ -8,7 +8,7 @@ import { MAIN_MESSAGE } from "../src/constants/message";
 import {
   onReadErrorWithAlert,
   onStanbyErrorWithAlert,
-} from "../src/lib/nfcHandlers";
+} from "../src/lib/nfcCommonHandlers";
 
 export default function Home() {
   const [mainMessage, setMainMessage] = useState(MAIN_MESSAGE.LOADING);
