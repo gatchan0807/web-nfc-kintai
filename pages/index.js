@@ -87,6 +87,8 @@ const postNFCDataToApi = async (event, { setMainMessage }) => {
 
   if (result.statusCode === 200) {
     setMainMessage(MAIN_MESSAGE.SUCCESS)
+  } else if (result.statusCode === 401) {
+    setMainMessage(MAIN_MESSAGE.CHECK_CARD)
   } else if (result.statusCode === 404 || result.statusCode === 400) {
     setMainMessage(MAIN_MESSAGE.FAILED)
   } else {
