@@ -69,20 +69,27 @@ const postNFCDataToApi = async (event, { setMainMessage }) => {
     const textDecoder = new TextDecoder(encoding);
     payload.passcode = textDecoder.decode(data);
   }
-  // チェック用
-  console.log(payload);
 
   // 表示メッセージを変更
   setMainMessage(MAIN_MESSAGE.SENDING);
-  // APIリクエスト実行
-  const res = await fetch("/api/hello", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-  console.log(await res.json());
 
-  // TODO: API結果によってMAIN_MESSAGEの値を変更
+  // APIリクエスト実行
+  const res = await fetch(
+    `https://script.google.com/macros/s/AKfycby1ZXYDQ7SxHneyPENHLurJtPMPIYYNuxchQR1hqxl_03SWCLvvjc3N/exec?items=${JSON.stringify(
+      payload
+    )}`, {
+      mode: "cors",
+      redirect: "follow",
+    }
+  );
+
+  const result = JSON.parse(await res.text())
+
+  if (result.statusCode === 200) {
+    setMainMessage(MAIN_MESSAGE.SUCCESS)
+  } else if (result.statusCode === 404 || result.statusCode === 400) {
+    setMainMessage(MAIN_MESSAGE.FAILED)
+  } else {
+    setMainMessage(MAIN_MESSAGE.PLEASE_RETRY)
+  }
 };

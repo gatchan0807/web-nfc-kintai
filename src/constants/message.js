@@ -5,6 +5,8 @@ export const MAIN_MESSAGE = {
   LOADING: "Loading...",
   SENDING: "Sending...",
   SUCCESS: "Success!",
+  FAILED: "Send Failed...",
+  PLEASE_RETRY: "Sorry. Please Retry",
   INPUT_WAIT: "Input Passcode...",
   NON_SUPPORT: "Not Supported.",
   WRITE_STAND_BY: "Write Stand by...",
